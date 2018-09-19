@@ -18,6 +18,8 @@ class TuringChatMode(object):
     def __init__(self):
         # API接口地址
         self.turing_url = 'http://www.tuling123.com/openapi/api?'
+        # AppKey密钥
+        self.app_key = '82622364a28142878dd8ad634eec401c'
 
     def getTuringText(self, text):
         """获取聊天返回内容"""
@@ -28,7 +30,7 @@ class TuringChatMode(object):
         # 请求参数
         turing_url_data = dict(
             # AppKey密钥
-            key='82622364a28142878dd8ad634eec401c',
+            key=self.app_key,
             # 聊天请求内容
             info=text,
             # 用户唯一标志（可以传IP地址或者MAC地址，或者其他的唯一标识）
