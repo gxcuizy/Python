@@ -3,8 +3,9 @@
 
 """
 通过splinter刷12306火车票
-可以自动填充账号密码，同时，在登录时，也可以修改账号密码
-然后手动识别验证码，并登陆，接下来的事情，交由脚本来做了，静静的等待抢票结果就好（刷票过程中，浏览器不可关闭）
+进入登陆页面，可以选择扫码登陆或者账号密码登陆
+登陆成功后，接下来的事情，交由脚本来做了，静静的等待抢票结果就好（刷票过程中，浏览器不可关闭）
+抢票成功，会进行手机短信和邮件的通知
 author: cuizy
 time: 2018-11-21
 """
@@ -118,52 +119,56 @@ class BrushTicket(object):
                 count += 1
                 print('第%d次点击查询……' % count)
                 try:
-                    car_no_location = self.driver.find_by_id("queryLeftTable")[0].find_by_text(self.number)[1]
-                    current_tr = car_no_location.find_by_xpath("./../../../../..")
-                    if current_tr.find_by_tag('td')[self.seat_type_index].text == '--':
-                        print('无此座位类型出售，已结束当前刷票，请重新开启！')
-                        sys.exit(1)
-                    elif current_tr.find_by_tag('td')[self.seat_type_index].text == '无':
-                        print('无票，继续尝试……')
-                        sleep(1)
+                    car_no_location = self.driver.find_by_id("queryLeftTable")[0].find_by_text(self.number)
+                    if car_no_location:
+                        current_tr = car_no_location[1].find_by_xpath("./../../../../..")
+                        if current_tr.find_by_tag('td')[self.seat_type_index].text == '--':
+                            print('无此座位类型出售，已结束当前刷票，请重新开启！')
+                            sys.exit(1)
+                        elif current_tr.find_by_tag('td')[self.seat_type_index].text == '无':
+                            print('无票，继续尝试……')
+                            sleep(1)
+                        else:
+                            # 有票，尝试预订
+                            print('刷到票了（余票数：' + str(current_tr.find_by_tag('td')[self.seat_type_index].text) + '），开始尝试预订……')
+                            current_tr.find_by_css('td.no-br>a')[0].click()
+                            sleep(1)
+                            key_value = 1
+                            for p in self.passengers:
+                                # 选择用户
+                                print('开始选择用户……')
+                                self.driver.find_by_text(p).last.click()
+                                # 选择座位类型
+                                print('开始选择席别……')
+                                if self.seat_type_value != 0:
+                                    self.driver.find_by_xpath(
+                                        "//select[@id='seatType_" + str(key_value) + "']/option[@value='" + str(
+                                            self.seat_type_value) + "']").first.click()
+                                key_value += 1
+                                sleep(0.2)
+                                if p[-1] == ')':
+                                    self.driver.find_by_id('dialog_xsertcj_ok').click()
+                            print('正在提交订单……')
+                            self.driver.find_by_id('submitOrder_id').click()
+                            sleep(2)
+                            # 查看放回结果是否正常
+                            submit_false_info = self.driver.find_by_id('orderResultInfo_id')[0].text
+                            if submit_false_info != '':
+                                print(submit_false_info)
+                                self.driver.find_by_id('qr_closeTranforDialog_id').click()
+                                sleep(0.2)
+                                self.driver.find_by_id('preStep_id').click()
+                                sleep(0.3)
+                                continue
+                            print('正在确认订单……')
+                            self.driver.find_by_id('qr_submit_id').click()
+                            print('预订成功，请及时前往支付……')
+                            # 发送通知信息
+                            self.send_mail(self.receiver_email, '恭喜您，抢到票了，请及时前往12306支付订单！')
+                            self.send_sms(self.receiver_mobile, '您的验证码是：8888。请不要把验证码泄露给其他人。')
                     else:
-                        # 有票，尝试预订
-                        print('刷到票了（余票数：' + str(current_tr.find_by_tag('td')[self.seat_type_index].text) + '），开始尝试预订……')
-                        current_tr.find_by_css('td.no-br>a')[0].click()
-                        sleep(1)
-                        key_value = 1
-                        for p in self.passengers:
-                            # 选择用户
-                            print('开始选择用户……')
-                            self.driver.find_by_text(p).last.click()
-                            # 选择座位类型
-                            print('开始选择席别……')
-                            if self.seat_type_value != 0:
-                                self.driver.find_by_xpath(
-                                    "//select[@id='seatType_" + str(key_value) + "']/option[@value='" + str(
-                                        self.seat_type_value) + "']").first.click()
-                            key_value += 1
-                            sleep(0.2)
-                            if p[-1] == ')':
-                                self.driver.find_by_id('dialog_xsertcj_ok').click()
-                        print('正在提交订单……')
-                        self.driver.find_by_id('submitOrder_id').click()
-                        sleep(2)
-                        # 查看放回结果是否正常
-                        submit_false_info = self.driver.find_by_id('orderResultInfo_id')[0].text
-                        if submit_false_info != '':
-                            print(submit_false_info)
-                            self.driver.find_by_id('qr_closeTranforDialog_id').click()
-                            sleep(0.2)
-                            self.driver.find_by_id('preStep_id').click()
-                            sleep(0.3)
-                            continue
-                        print('正在确认订单……')
-                        self.driver.find_by_id('qr_submit_id').click()
-                        print('预订成功，请及时前往支付……')
-                        # 发送通知信息
-                        self.send_mail(self.receiver_email, '恭喜您，抢到票了，请及时前往12306支付订单！')
-                        self.send_sms(self.receiver_mobile, '您的验证码是：8888。请不要把验证码泄露给其他人。')
+                        print('不存在当前车次-%s，已结束当前刷票，请重新开启！' % self.number)
+                        sys.exit(1)
                 except Exception as error_info:
                     print(error_info)
         except Exception as error_info:
