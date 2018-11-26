@@ -82,7 +82,7 @@ class BrushTicket(object):
         self.init_my_url = 'https://kyfw.12306.cn/otn/view/index.html'
         self.ticket_url = 'https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc'
         # 浏览器驱动信息，驱动下载页：https://sites.google.com/a/chromium.org/chromedriver/downloads
-        self.driver_name = 'chrome'
+        self.driver_name = 'firefox'
         self.driver = Browser(driver_name=self.driver_name)
 
     def do_login(self):
@@ -119,9 +119,8 @@ class BrushTicket(object):
                 count += 1
                 print('第%d次点击查询……' % count)
                 try:
-                    car_no_location = self.driver.find_by_id("queryLeftTable")[0].find_by_text(self.number)
-                    if car_no_location:
-                        current_tr = car_no_location[1].find_by_xpath("./../../../../..")
+                    current_tr = self.driver.find_by_xpath('//tr[@datatran="' + self.number + '"]/preceding-sibling::tr[1]')
+                    if current_tr:
                         if current_tr.find_by_tag('td')[self.seat_type_index].text == '--':
                             print('无此座位类型出售，已结束当前刷票，请重新开启！')
                             sys.exit(1)
@@ -167,7 +166,7 @@ class BrushTicket(object):
                             self.send_mail(self.receiver_email, '恭喜您，抢到票了，请及时前往12306支付订单！')
                             self.send_sms(self.receiver_mobile, '您的验证码是：8888。请不要把验证码泄露给其他人。')
                     else:
-                        print('不存在当前车次-%s，已结束当前刷票，请重新开启！' % self.number)
+                        print('不存在当前车次【%s】，已结束当前刷票，请重新开启！' % self.number)
                         sys.exit(1)
                 except Exception as error_info:
                     print(error_info)
