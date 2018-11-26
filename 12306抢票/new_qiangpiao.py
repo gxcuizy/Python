@@ -82,7 +82,7 @@ class BrushTicket(object):
         self.init_my_url = 'https://kyfw.12306.cn/otn/view/index.html'
         self.ticket_url = 'https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc'
         # 浏览器驱动信息，驱动下载页：https://sites.google.com/a/chromium.org/chromedriver/downloads
-        self.driver_name = 'firefox'
+        self.driver_name = 'chrome'
         self.driver = Browser(driver_name=self.driver_name)
 
     def do_login(self):
@@ -196,7 +196,7 @@ class BrushTicket(object):
         host = 'smtp.163.com'
         port = 25
         sender = 'gxcuizy@163.com'  # 你的发件邮箱号码
-        pwd = 'CUIzy9118'  # 不是登陆密码，是客户端授权密码
+        pwd = '********'  # 不是登陆密码，是客户端授权密码
         # 发件信息
         receiver = receiver_address
         body = '<h2>温馨提醒：</h2><p>' + content + '</p>'
