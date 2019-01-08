@@ -7,13 +7,12 @@
 登陆成功后，接下来的事情，交由脚本来做了，静静的等待抢票结果就好（刷票过程中，浏览器不可关闭）
 抢票成功，会进行手机短信和邮件的通知
 author: cuizy
-time: 2018-12-28
+time: 2019-01-08
 """
 
 import re
 from splinter.browser import Browser
 from time import sleep
-import sys
 import httplib2
 from urllib import parse
 import smtplib
@@ -127,60 +126,58 @@ class BrushTicket(object):
                 local_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 print('第%d次点击查询……[%s]' % (count, local_date))
                 try:
-                    start_list = self.driver.find_by_css('.start-t')
-                    for start_time in start_list:
-                        current_time = start_time.text
-                        current_tr = start_time.find_by_xpath('ancestor::tr')
+                    for car_no in self.numbers:
+                        current_tr = self.driver.find_by_xpath('//tr[@datatran="' + car_no + '"]/preceding-sibling::tr[1]')
                         if current_tr:
-                            car_no = current_tr.find_by_css('.number').text
-                            if car_no in self.numbers:
-                                if current_tr.find_by_tag('td')[self.seat_type_index].text == '--':
-                                    print('%s无此座位类型出售……' % (car_no + '(' + current_time + ')',))
+                            current_time = current_tr.find_by_css('.start-t').text
+                            if current_tr.find_by_tag('td')[self.seat_type_index].text == '--':
+                                print('%s无此座位类型出售……' % (car_no + '(' + current_time + ')',))
+                                sleep(0.2)
+                            elif current_tr.find_by_tag('td')[self.seat_type_index].text == '无':
+                                print('%s无票……' % (car_no + '(' + current_time + ')',))
+                                sleep(0.2)
+                            else:
+                                # 有票，尝试预订
+                                print(car_no + '(' + current_time + ')刷到票了（余票数：' + str(
+                                    current_tr.find_by_tag('td')[self.seat_type_index].text) + '），开始尝试预订……')
+                                current_tr.find_by_css('td.no-br>a')[0].click()
+                                sleep(1)
+                                key_value = 1
+                                for p in self.passengers:
+                                    if '()' in p:
+                                        p = p[:-1] + '学生' + p[-1:]
+                                    # 选择用户
+                                    print('开始选择用户……')
+                                    self.driver.find_by_text(p).last.click()
+                                    # 选择座位类型
+                                    print('开始选择席别……')
+                                    if self.seat_type_value != 0:
+                                        self.driver.find_by_xpath(
+                                            "//select[@id='seatType_" + str(key_value) + "']/option[@value='" + str(
+                                                self.seat_type_value) + "']").first.click()
+                                    key_value += 1
                                     sleep(0.2)
-                                elif current_tr.find_by_tag('td')[self.seat_type_index].text == '无':
-                                    print('%s无票……' % (car_no + '(' + current_time + ')',))
+                                    if p[-1] == ')':
+                                        self.driver.find_by_id('dialog_xsertcj_ok').click()
+                                        sleep(0.1)
+                                print('正在提交订单……')
+                                self.driver.find_by_id('submitOrder_id').click()
+                                sleep(1)
+                                # 查看放回结果是否正常
+                                submit_false_info = self.driver.find_by_id('orderResultInfo_id')[0].text
+                                if submit_false_info != '':
+                                    print(submit_false_info)
+                                    self.driver.find_by_id('qr_closeTranforDialog_id').click()
                                     sleep(0.2)
-                                else:
-                                    # 有票，尝试预订
-                                    print(car_no + '(' + current_time + ')刷到票了（余票数：' + str(current_tr.find_by_tag('td')[self.seat_type_index].text) + '），开始尝试预订……')
-                                    current_tr.find_by_css('td.no-br>a')[0].click()
-                                    sleep(0.5)
-                                    key_value = 1
-                                    for p in self.passengers:
-                                        if '()' in p:
-                                            p = p[:-1] + '学生' + p[-1:]
-                                        # 选择用户
-                                        print('开始选择用户……')
-                                        self.driver.find_by_text(p).last.click()
-                                        # 选择座位类型
-                                        print('开始选择席别……')
-                                        if self.seat_type_value != 0:
-                                            self.driver.find_by_xpath(
-                                                "//select[@id='seatType_" + str(key_value) + "']/option[@value='" + str(
-                                                    self.seat_type_value) + "']").first.click()
-                                        key_value += 1
-                                        sleep(0.2)
-                                        if p[-1] == ')':
-                                            self.driver.find_by_id('dialog_xsertcj_ok').click()
-                                    print('正在提交订单……')
-                                    self.driver.find_by_id('submitOrder_id').click()
-                                    sleep(2)
-                                    # 查看放回结果是否正常
-                                    submit_false_info = self.driver.find_by_id('orderResultInfo_id')[0].text
-                                    if submit_false_info != '':
-                                        print(submit_false_info)
-                                        self.driver.find_by_id('qr_closeTranforDialog_id').click()
-                                        sleep(0.2)
-                                        self.driver.find_by_id('preStep_id').click()
-                                        sleep(0.3)
-                                        continue
-                                    print('正在确认订单……')
-                                    self.driver.find_by_id('qr_submit_id').click()
-                                    print('预订成功，请及时前往支付……')
-                                    # 发送通知信息
-                                    self.send_mail(self.receiver_email, '恭喜您，抢到票了，请及时前往12306支付订单！')
-                                    self.send_sms(self.receiver_mobile, '您的验证码是：8888。请不要把验证码泄露给其他人。')
-                                    sys.exit(0)
+                                    self.driver.find_by_id('preStep_id').click()
+                                    sleep(0.3)
+                                    continue
+                                print('正在确认订单……')
+                                self.driver.find_by_id('qr_submit_id').click()
+                                print('预订成功，请及时前往支付……')
+                                # 发送通知信息
+                                self.send_mail(self.receiver_email, '恭喜您，抢到票了，请及时前往12306支付订单！')
+                                self.send_sms(self.receiver_mobile, '您的验证码是：8888。请不要把验证码泄露给其他人。')
                         else:
                             print('当前车次异常')
                 except Exception as error_info:

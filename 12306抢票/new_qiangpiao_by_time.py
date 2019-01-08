@@ -18,6 +18,7 @@ import httplib2
 from urllib import parse
 import smtplib
 from email.mime.text import MIMEText
+import time
 
 
 class BrushTicket(object):
@@ -126,10 +127,16 @@ class BrushTicket(object):
             self.driver.reload()
             count = 0
             while self.driver.url == self.ticket_url:
-                self.driver.find_by_text('查询').click()
-                sleep(1)
+                try:
+                    self.driver.find_by_text('查询').click()
+                except Exception as error_info:
+                    print(error_info)
+                    sleep(1)
+                    continue
+                sleep(0.5)
                 count += 1
-                print('第%d次点击查询……' % count)
+                local_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print('第%d次点击查询……[%s]' % (count, local_date))
                 try:
                     start_list = self.driver.find_by_css('.start-t')
                     for start_time in start_list:
@@ -153,7 +160,7 @@ class BrushTicket(object):
                                     # 有票，尝试预订
                                     print(car_no + '(' + current_time + ')刷到票了（余票数：' + str(current_tr.find_by_tag('td')[self.seat_type_index].text) + '），开始尝试预订……')
                                     current_tr.find_by_css('td.no-br>a')[0].click()
-                                    sleep(1)
+                                    sleep(0.5)
                                     key_value = 1
                                     for p in self.passengers:
                                         if '()' in p:
@@ -192,6 +199,9 @@ class BrushTicket(object):
                             else:
                                 print('不存在当前车次【%s】，已结束当前刷票，请重新开启！' % self.number)
                                 sys.exit(1)
+                        elif current_time_value > self.my_end_time:
+                            break
+
                 except Exception as error_info:
                     print(error_info)
         except Exception as error_info:
