@@ -18,6 +18,7 @@ import httplib2
 from urllib import parse
 import smtplib
 from email.mime.text import MIMEText
+import time
 
 
 class BrushTicket(object):
@@ -114,10 +115,16 @@ class BrushTicket(object):
             self.driver.reload()
             count = 0
             while self.driver.url == self.ticket_url:
-                self.driver.find_by_text('查询').click()
-                sleep(1)
+                try:
+                    self.driver.find_by_text('查询').click()
+                except Exception as error_info:
+                    print(error_info)
+                    sleep(1)
+                    continue
+                sleep(0.5)
                 count += 1
-                print('第%d次点击查询……' % count)
+                local_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print('第%d次点击查询……[%s]' % (count, local_date))
                 try:
                     current_tr = self.driver.find_by_xpath('//tr[@datatran="' + self.number + '"]/preceding-sibling::tr[1]')
                     if current_tr:
@@ -134,6 +141,8 @@ class BrushTicket(object):
                             sleep(1)
                             key_value = 1
                             for p in self.passengers:
+                                if '()' in p:
+                                    p = p[:-1] + '学生' + p[-1:]
                                 # 选择用户
                                 print('开始选择用户……')
                                 self.driver.find_by_text(p).last.click()
@@ -170,6 +179,8 @@ class BrushTicket(object):
                         sys.exit(1)
                 except Exception as error_info:
                     print(error_info)
+                    # 跳转到抢票页面
+                    self.driver.visit(self.ticket_url)
         except Exception as error_info:
             print(error_info)
 
@@ -196,7 +207,7 @@ class BrushTicket(object):
         host = 'smtp.163.com'
         port = 25
         sender = 'gxcuizy@163.com'  # 你的发件邮箱号码
-        pwd = '********'  # 不是登陆密码，是客户端授权密码
+        pwd = '******'  # 不是登陆密码，是客户端授权密码
         # 发件信息
         receiver = receiver_address
         body = '<h2>温馨提醒：</h2><p>' + content + '</p>'
@@ -212,7 +223,7 @@ class BrushTicket(object):
 
 if __name__ == '__main__':
     # 乘客姓名
-    passengers_input = input('请输入乘车人姓名，多人用英文逗号“,”连接，（例如单人“张三”或者多人“张三,李四”）：')
+    passengers_input = input('请输入乘车人姓名，多人用英文逗号“,”连接，（例如单人“张三”或者多人“张三,李四”，如果学生的话输入“王五()”）：')
     passengers = passengers_input.split(",")
     while passengers_input == '' or len(passengers) > 4:
         print('乘车人最少1位，最多4位！')

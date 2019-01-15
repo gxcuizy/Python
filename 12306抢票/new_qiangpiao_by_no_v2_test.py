@@ -162,7 +162,7 @@ class BrushTicket(object):
                                         sleep(0.1)
                                 print('正在提交订单……')
                                 self.driver.find_by_id('submitOrder_id').click()
-                                sleep(1)
+                                sleep(0.5)
                                 # 查看放回结果是否正常
                                 submit_false_info = self.driver.find_by_id('orderResultInfo_id')[0].text
                                 if submit_false_info != '':
@@ -227,17 +227,10 @@ class BrushTicket(object):
 
 if __name__ == '__main__':
     # 乘客姓名
-    passengers_input = input('请输入乘车人姓名，多人用英文逗号“,”连接，（例如单人“张三”或者多人“张三,李四”，如果学生的话输入“王五()”）：')
-    passengers = passengers_input.split(",")
-    while passengers_input == '' or len(passengers) > 4:
-        print('乘车人最少1位，最多4位！')
-        passengers_input = input('请重新输入乘车人姓名，多人用英文逗号“,”连接，（例如单人“张三”或者多人“张三,李四”）：')
-        passengers = passengers_input.split(",")
+    passengers = ('李四',)
     # 乘车日期
-    from_time = input('请输入乘车日期（例如“2018-08-08”）：')
+    from_time = '2019-01-20'
     date_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
-    while from_time == '' or re.findall(date_pattern, from_time) == []:
-        from_time = input('乘车日期不能为空或者时间格式不正确，请重新输入：')
     # 城市cookie字典
     city_list = {
         'bj': '%u5317%u4EAC%2CBJP',  # 北京
@@ -251,33 +244,18 @@ if __name__ == '__main__':
         'wzn': '%u68A7%u5DDE%u5357%2CWBZ',  # 梧州南
     }
     # 出发站
-    from_input = input('请输入出发站，只需要输入首字母就行（例如北京“bj”）：')
-    while from_input not in city_list.keys():
-        from_input = input('出发站不能为空或不支持当前出发站（如有需要，请联系管理员！），请重新输入：')
+    from_input = 'bj'
     from_station = city_list[from_input]
     # 终点站
-    to_input = input('请输入终点站，只需要输入首字母就行（例如北京“bj”）：')
-    while to_input not in city_list.keys():
-        to_input = input('终点站不能为空或不支持当前终点站（如有需要，请联系管理员！），请重新输入：')
+    to_input = 'nn'
     to_station = city_list[to_input]
     # 乘车车次
-    number_input = input('请输入抢票车次号，多车次用英文逗号“,”链接，（例如单车次“Z285”或者多车次“Z285,G110”）：')
-    numbers = number_input.split(",")
-    while number_input == '':
-        number_input = input('请重新输入抢票车次号，多车次用英文逗号“,”链接，（例如单车次“Z285”或者多车次“Z285,G110”）：')
-        numbers = number_input.split(",")
+    numbers = ('G529',)
     # 座位类型
-    seat_type = input('请输入座位类型（例如“软卧”）：')
-    while seat_type == '':
-        seat_type = input('座位类型不能为空，请重新输入：')
+    seat_type = '二等座'
     # 抢票成功，通知该手机号码
-    receiver_mobile = input('请预留一个手机号码，方便抢到票后进行通知（例如：18888888888）：')
-    mobile_pattern = re.compile(r'^1{1}\d{10}$')
-    while receiver_mobile == '' or re.findall(mobile_pattern, receiver_mobile) == []:
-        receiver_mobile = input('预留手机号码不能为空或者格式不正确，请重新输入：')
-    receiver_email = input('请预留一个邮箱，方便抢到票后进行通知（例如：test@163.com）：')
-    while receiver_email == '':
-        receiver_email = input('预留邮箱不能为空，请重新输入：')
+    receiver_mobile = '18488888888'
+    receiver_email = 'gxcuizy@163.com'
     # 开始抢票
     ticket = BrushTicket(passengers, from_time, from_station, to_station, numbers, seat_type, receiver_mobile,
                          receiver_email)

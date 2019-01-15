@@ -204,6 +204,8 @@ class BrushTicket(object):
 
                 except Exception as error_info:
                     print(error_info)
+                    # 跳转到抢票页面
+                    self.driver.visit(self.ticket_url)
         except Exception as error_info:
             print(error_info)
 
