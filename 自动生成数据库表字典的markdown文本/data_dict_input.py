@@ -53,8 +53,8 @@ class DataDict(object):
             # 打开文件，准备写入
             dict_file = open(file_path, 'a', encoding='UTF-8')
             dict_file.write('#### %s %s' % (table_name, table_comment))
-            dict_file.write('\n | 字段名称 | 字段类型 | 默认值 | 字段注释 |')
-            dict_file.write('\n | --- | --- | --- | --- |')
+            dict_file.write('\n| 字段名称 | 字段类型 | 默认值 | 字段注释 |')
+            dict_file.write('\n| --- | --- | --- | --- |')
             # 表结构查询
             field_str = "COLUMN_NAME,COLUMN_TYPE,COLUMN_DEFAULT,COLUMN_COMMENT from information_schema.COLUMNS"
             sql = "select %s where table_schema='%s' and table_name='%s'" % (field_str, self.db_name, table_name)
@@ -65,8 +65,8 @@ class DataDict(object):
                 column_type = field['COLUMN_TYPE']
                 column_default = str(field['COLUMN_DEFAULT'])
                 column_comment = field['COLUMN_COMMENT']
-                info = ' | ' + column_name + ' | ' + column_type + ' | ' + column_default + ' | ' + column_comment + ' | '
-                dict_file.write('\n ' + info)
+                info = '| ' + column_name + ' | ' + column_type + ' | ' + column_default + ' | ' + column_comment + ' | '
+                dict_file.write('\n' + info)
             # 关闭连接
             print('完成表%s的数据字典' % (table_name,))
             dict_file.close()
