@@ -33,7 +33,7 @@ class GetIpData(object):
         proxies = {'http': 'http://' + ip_url, 'https': 'https://' + ip_url}
         res = False
         try:
-            request = requests.get(url=self.check_url, headers=self.header, proxies=proxies, timeout=5)
+            request = requests.get(url=self.check_url, headers=self.header, proxies=proxies, timeout=3)
             if request.status_code == 200:
                 res = True
         except Exception as error_info:
@@ -60,7 +60,7 @@ class GetIpData(object):
                     ip_type = td_list[5].get_text()
                     info = {'ip': ip_address, 'port': ip_port, 'type': ip_type}
                     # 先校验一下IP的有效性再存储
-                    check_res = self.check_ip(info);
+                    check_res = self.check_ip(info)
                     if check_res:
                         print('IP有效：', info)
                         self.json_data.append(info)
