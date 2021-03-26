@@ -8,6 +8,7 @@
 ├── xiaohuan_china.py 		# 获取小幻代理的国内IP刷赞
 ├── xiaoshu.py        		# 获取晓舒代理的IP刷赞
 ├── refresh_times.py  		# 刷新活动页面的访问次数
+├── process  		        # 多进程的方式的脚本代码
 ```
 
 ### 刷赞方式
