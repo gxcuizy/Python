@@ -69,37 +69,39 @@ def refresh_down_time():
         diff_time -= 1
 
 
-# 设置页面数据
-tk_obj = Tk()
-tk_obj.geometry('400x280')
-tk_obj.resizable(0, 0)
-tk_obj.config(bg='white')
-tk_obj.title('倒计时应用')
-Label(tk_obj, text='下班倒计时', font='宋体 20 bold', bg='white').pack()
-# 设置当前时间
-Label(tk_obj, font='宋体 15 bold', text='当前时间：', bg='white').place(x=50, y=60)
-curr_time = Label(tk_obj, font='宋体 15', text='', fg='gray25', bg='white')
-curr_time.place(x=160, y=60)
-refresh_current_time()
-# 设置下班时间
-Label(tk_obj, font='宋体 15 bold', text='下班时间：', bg='white').place(x=50, y=110)
-# 下班时间-小时
-work_hour = StringVar()
-Entry(tk_obj, textvariable=work_hour, width=2, font='宋体 12').place(x=160, y=115)
-work_hour.set('18')
-# 下班时间-分钟
-work_minute = StringVar()
-Entry(tk_obj, textvariable=work_minute, width=2, font='宋体 12').place(x=185, y=115)
-work_minute.set('00')
-# 下班时间-秒数
-work_second = StringVar()
-Entry(tk_obj, textvariable=work_second, width=2, font='宋体 12').place(x=210, y=115)
-work_second.set('00')
-# 设置剩余时间
-Label(tk_obj, font='宋体 15 bold', text='剩余时间：', bg='white').place(x=50, y=160)
-down_label = Label(tk_obj, font='宋体 23', text='', fg='gray25', bg='white')
-down_label.place(x=160, y=155)
-down_label.config(text='00时00分00秒')
-# 开始计时按钮
-Button(tk_obj, text='START', bd='5', command=refresh_down_time, bg='green', font='宋体 10 bold').place(x=150, y=220)
-tk_obj.mainloop()
+# 程序主入口
+if __name__ == "__main__":
+    # 设置页面数据
+    tk_obj = Tk()
+    tk_obj.geometry('400x280')
+    tk_obj.resizable(0, 0)
+    tk_obj.config(bg='white')
+    tk_obj.title('倒计时应用')
+    Label(tk_obj, text='下班倒计时', font='宋体 20 bold', bg='white').pack()
+    # 设置当前时间
+    Label(tk_obj, font='宋体 15 bold', text='当前时间：', bg='white').place(x=50, y=60)
+    curr_time = Label(tk_obj, font='宋体 15', text='', fg='gray25', bg='white')
+    curr_time.place(x=160, y=60)
+    refresh_current_time()
+    # 设置下班时间
+    Label(tk_obj, font='宋体 15 bold', text='下班时间：', bg='white').place(x=50, y=110)
+    # 下班时间-小时
+    work_hour = StringVar()
+    Entry(tk_obj, textvariable=work_hour, width=2, font='宋体 12').place(x=160, y=115)
+    work_hour.set('18')
+    # 下班时间-分钟
+    work_minute = StringVar()
+    Entry(tk_obj, textvariable=work_minute, width=2, font='宋体 12').place(x=185, y=115)
+    work_minute.set('00')
+    # 下班时间-秒数
+    work_second = StringVar()
+    Entry(tk_obj, textvariable=work_second, width=2, font='宋体 12').place(x=210, y=115)
+    work_second.set('00')
+    # 设置剩余时间
+    Label(tk_obj, font='宋体 15 bold', text='剩余时间：', bg='white').place(x=50, y=160)
+    down_label = Label(tk_obj, font='宋体 23', text='', fg='gray25', bg='white')
+    down_label.place(x=160, y=155)
+    down_label.config(text='00时00分00秒')
+    # 开始计时按钮
+    Button(tk_obj, text='START', bd='5', command=refresh_down_time, bg='green', font='宋体 10 bold').place(x=150, y=220)
+    tk_obj.mainloop()
