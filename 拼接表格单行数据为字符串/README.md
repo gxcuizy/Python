@@ -1,7 +1,8 @@
 ### 文件结构
 
 ```
-├── join_excel_data.py           # 拼接Excel表格单行数据
+├── join_excel.py                # 拼接Excel表格单行数据（不用引号拼接）
+├── join_excel_data.py           # 拼接Excel表格单行数据（需要引号拼接）
 ```
 
 ### 功能描述
