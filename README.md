@@ -1,14 +1,6 @@
 ## Python 小脚本，Python版本为3.6
 
-一些第三方模块，需要自行安装，例如安装pymysql，安装方式如下：
-
-```
-pip install pymysql
-```
-
-其他模块的安装方法类似
-
-### 很好用的代理（SmartProxy）
+### 很好用的代理推荐-SmartProxy
 
 最近发现了一个很好用的代理，给朋友们推荐一下：SmartProxy  
 主打1亿真实住宅IP资源，专业海外http代理商，千万级优质资源，覆盖全球城市，高匿稳定提供100%原生住宅IP，支持社交账户、电商平台、网络数据收集等服务。  
@@ -22,6 +14,16 @@ pip install pymysql
 官网链接：[https://www.smartproxy.cn](https://www.smartproxy.cn/regist?invite=7M2ZVK)
 
 专属注册链接：[https://www.smartproxy.cn/regist?invite=7M2ZVK](https://www.smartproxy.cn/regist?invite=7M2ZVK)
+
+### 如何安装需要的模块
+
+一些第三方模块，需要自行安装，例如安装pymysql，安装方式如下：
+
+```
+pip install pymysql
+```
+
+其他模块的安装方法类似
 
 ### 如有问题，请联系我
 
